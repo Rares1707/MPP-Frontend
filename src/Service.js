@@ -60,6 +60,13 @@ export function Service({list, setList, setSelectedBook}) {
         setList(updatedList);
     }
 
+    function handleClickSort()
+    {
+        const newList = [...list];
+        newList.sort((book1, book2) => book1.rating - book2.rating)
+        setList(newList)
+    }
+
     return (
         <header className='App-header'>
             <BookList list={list} setSelectedBook={setSelectedBook} />
@@ -79,6 +86,7 @@ export function Service({list, setList, setSelectedBook}) {
                 <Button onClick={handleClickAdd} prompt={'Add'} />
                 <Button onClick={handleClickRemove} prompt={'Remove'} />
                 <Button onClick={handleClickUpdate} prompt={'Update'} />
+                <Button onClick={handleClickSort} prompt={'Sort'} />
             </section>
         </header>
     );
