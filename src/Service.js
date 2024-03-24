@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import {RatingsLineChart} from './RatingsLineChart';
 import {BookList} from './BookList';
-import {Link} from 'react-router-dom';
 
 function Button({onClick, prompt}) {
     return <button onClick={onClick}>{prompt}</button>;
@@ -43,7 +42,10 @@ export function Service({list, setList, setSelectedBook}) {
     function handleClickRemove() {
         if (list.length === 0) return;
         if (bookTitleText === '') return;
+
         const updatedList = list.filter((book) => book.title !== bookTitleText);
+        if (updatedList.length <= pageSize*currentPage)
+            handleClickPreviousPage()
         setList(updatedList);
     }
 

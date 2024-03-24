@@ -16,19 +16,11 @@ ChartJS.register(
     Legend
 )
 
-
-
-
-
-
-
-
 export function RatingsLineChart({listOfBooks}){
     const bookTitles = listOfBooks.map( (book) => book.title)
     const bookRatings = listOfBooks.map( (book) => book.rating)
-    const labels = ['The Sword of Kaigen', 'Martin Eden', 'The Dark Forest']
     let data = {
-        bookTitles,
+        labels: bookTitles,
         datasets: [
             {
                 label: 'Ratings',
@@ -38,15 +30,9 @@ export function RatingsLineChart({listOfBooks}){
             },
         ],
     };
-    /*const options = {
-        plugins:{
-            legend: true
-        },
-    }*/
 
     return(
         <Line
         data={data}
-        //options={options}
     />)
 }
