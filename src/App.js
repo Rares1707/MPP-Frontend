@@ -8,6 +8,11 @@ let books = [
     {title: 'The Sword of Kaigen', id: 1, rating: 4.8},
     {title: 'Martin Eden', id: 2, rating: 4.7},
     {title: 'The Dark Forest', id: 3, rating: 4.9},
+    {title: 'Don Quixote', id: 4, rating: 4.8},
+    {title: 'Chira Chiralina', id: 5, rating: 4.7},
+    {title: 'The Name of the Wind', id: 6, rating: 5},
+    {title: 'Mort', id: 7, rating: 4.8},
+    {title: 'Rhythm of War', id: 8, rating: 4.7}
 ];
 
 function App() {

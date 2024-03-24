@@ -1,5 +1,7 @@
 import {useState} from 'react';
+import {RatingsLineChart} from './RatingsLineChart';
 import {BookList} from './BookList';
+import {Link} from 'react-router-dom';
 
 function Button({onClick, prompt}) {
     return <button onClick={onClick}>{prompt}</button>;
@@ -19,6 +21,8 @@ function TextBox({state, onChange, placeholder}) {
 export function Service({list, setList, setSelectedBook}) {
     const [bookTitleText, setBookTitleText] = useState('');
     const [bookRatingText, setBookRatingText] = useState('');
+    const pageSize = 3;
+    const [currentPage, setCurrentPage] = useState(0)
 
     function handleClickAdd() {
         if (bookTitleText === '') return;
@@ -67,10 +71,29 @@ export function Service({list, setList, setSelectedBook}) {
         setList(newList)
     }
 
+    function handleClickPreviousPage()
+    {
+        if (currentPage > 0)
+            setCurrentPage(currentPage-1)
+    }
+
+    function handleClickNextPage()
+    {
+        if (pageSize*(currentPage+1) < list.length)
+            setCurrentPage(currentPage+1)
+    }
+
+
     return (
         <header className='App-header'>
-            <BookList list={list} setSelectedBook={setSelectedBook} />
             <section>
+                <BookList list={list} setSelectedBook={setSelectedBook} pageSize={pageSize} currentPage={currentPage}/>
+                <Button onClick={handleClickPreviousPage} prompt={'<<'}/>
+                <Button onClick={handleClickNextPage} prompt={'>>'}/>
+            </section>
+
+            <section>
+                <RatingsLineChart listOfBooks={list}/>
                 <TextBox
                     state={bookTitleText}
                     onChange={(e) => setBookTitleText(e.target.value)}

@@ -1,13 +1,19 @@
 import {Link} from 'react-router-dom';
 
-export function BookList({list, setSelectedBook}) {
-    let listOfBooks = list.map((book) => (
+export function BookList({list, setSelectedBook, pageSize, currentPage}) {
+    let displayedBooks = []
+    const lowerBound = currentPage*pageSize
+    for (let i= 0; (i < pageSize) && (lowerBound + i < list.length); i++)
+    {
+        displayedBooks.push(list[lowerBound + i])
+    }
+    let listOfBooks = displayedBooks.map((book) => (
         <li key={book.id}>
             <strong>
                 <Link
                     to='/view'
                     onClick={() => {
-                        let bookFound = list.find(
+                        let bookFound = displayedBooks.find(
                             (el) => book.title === el.title,
                         );
                         if (bookFound === undefined)
