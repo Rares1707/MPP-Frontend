@@ -1,10 +1,8 @@
 import {useState} from 'react';
 import {RatingsLineChart} from './RatingsLineChart';
 import {BookList} from './BookList';
-
-function Button({onClick, prompt}) {
-    return <button onClick={onClick}>{prompt}</button>;
-}
+import {DropdownList} from './DropdownList';
+import {Button} from './Button';
 
 function TextBox({state, onChange, placeholder}) {
     return (
@@ -20,7 +18,7 @@ function TextBox({state, onChange, placeholder}) {
 export function Service({list, setList, setSelectedBook}) {
     const [bookTitleText, setBookTitleText] = useState('');
     const [bookRatingText, setBookRatingText] = useState('');
-    const pageSize = 3;
+    const [pageSize, setPageSize] = useState(3);
     const [currentPage, setCurrentPage] = useState(0)
 
     function handleClickAdd() {
@@ -113,6 +111,7 @@ export function Service({list, setList, setSelectedBook}) {
                 <Button onClick={handleClickUpdate} prompt={'Update'} />
                 <Button onClick={handleClickSort} prompt={'Sort'} />
             </section>
+            <DropdownList setPageSize={setPageSize} setCurrentPage={setCurrentPage}/>
         </header>
     );
 }
