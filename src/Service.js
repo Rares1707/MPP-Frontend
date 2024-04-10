@@ -1,8 +1,11 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {RatingsLineChart} from './RatingsLineChart';
 import {BookList} from './BookList';
 import {DropdownList} from './DropdownList';
 import {Button} from './Button';
+import Axios from 'axios';
+import axios from 'axios';
+import async from 'async';
 
 function TextBox({state, onChange, placeholder}) {
     return (
@@ -15,13 +18,14 @@ function TextBox({state, onChange, placeholder}) {
     );
 }
 
-export function Service({list, setList, setSelectedBook}) {
+export function Service({list, fetchData, setSelectedBook}) {
     const [bookTitleText, setBookTitleText] = useState('');
     const [bookRatingText, setBookRatingText] = useState('');
+    const [bookIdText, setBookIdText] = useState('');
     const [pageSize, setPageSize] = useState(3);
     const [currentPage, setCurrentPage] = useState(0)
 
-    function handleClickAdd() {
+    async function handleClickAdd()  {
         if (bookTitleText === '') return;
         if (bookRatingText === '') return;
         if (bookRatingText.valueOf() < 0) return;
@@ -34,24 +38,48 @@ export function Service({list, setList, setSelectedBook}) {
             id: sortedList[sortedList.length - 1].id + 1,
             rating: bookRatingText,
         };
-        setList([...list, newBook]); // Create a new array with the updated book
+
+        axios.post(`http://localhost:5000/books/`, {
+            title: newBook.title,
+            rating: newBook.rating,
+        }).then((response) => {
+            //closeModal();
+            //navigate(`/game/${response.data.id}/`);
+            console.log(response)
+            //fetchData()
+        });
+
     }
 
     function handleClickRemove() {
         if (list.length === 0) return;
-        if (bookTitleText === '') return;
+        if (bookIdText === '') return;
+        if (bookIdText.valueOf() < 0) return;
 
-        const updatedList = list.filter((book) => book.title !== bookTitleText);
-        if (updatedList.length <= pageSize*currentPage)
+        axios.delete(`http://localhost:5000/book/${bookIdText}`).then((response) => {
+            console.log(response)
+            //fetchData();
+        })
+        //const updatedList = list.filter((book) => book.id !== bookIdText);
+        if (list.length <= pageSize*currentPage)
             handleClickPreviousPage()
-        setList(updatedList);
     }
 
     function handleClickUpdate() {
         if (list.length === 0) return;
+        if (bookIdText === '') return;
+        if (bookIdText.valueOf() < 0) return;
         if (bookTitleText === '') return;
         if (bookRatingText === '') return;
         if (bookRatingText.valueOf() < 0) return;
+
+        axios.put(`http://localhost:5000/book/${bookIdText}`, {
+            title: bookTitleText,
+            rating: bookRatingText
+        }).then((response) => {
+            console.log(response)
+        })
+
         const updatedList = list.map((book) => {
             if (book.title === bookTitleText)
                 return {
@@ -61,14 +89,14 @@ export function Service({list, setList, setSelectedBook}) {
                 };
             else return book;
         });
-        setList(updatedList);
+        //fetchData();
     }
 
     function handleClickSort()
     {
         const newList = [...list];
         newList.sort((book1, book2) => book1.rating - book2.rating)
-        setList(newList)
+        //fetchData(newList)
     }
 
     function handleClickPreviousPage()
@@ -103,6 +131,11 @@ export function Service({list, setList, setSelectedBook}) {
                     state={bookRatingText}
                     onChange={(e) => setBookRatingText(e.target.value)}
                     placeholder='Rating'
+                />
+                <TextBox
+                    state={bookIdText}
+                    onChange={(e) => setBookIdText(e.target.value)}
+                    placeholder='Id'
                 />
             </section>
             <section>
