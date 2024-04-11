@@ -1,1 +1,1 @@
-MPP Project
+Frontend part of my MPP Project.
