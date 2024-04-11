@@ -7,6 +7,7 @@ import {
     PointElement,
     Legend
 } from 'chart.js';
+import axios from 'axios';
 
 ChartJS.register(
     LineElement,
@@ -16,11 +17,13 @@ ChartJS.register(
     Legend
 )
 
-export function RatingsLineChart({listOfBooks}){
-    const bookTitles = listOfBooks.map( (book) => book.title)
-    const bookRatings = listOfBooks.map( (book) => book.rating)
+export function RatingsLineChart({bookTitles, bookRatings}){
+    //const bookTitles = listOfBooks.map( (book) => book.title)
+    //const bookRatings = listOfBooks.map( (book) => book.rating)
+    console.log(bookTitles)
+    console.log(bookRatings)
     let data = {
-        labels: bookTitles,
+        labels: Array.from(bookTitles),
         datasets: [
             {
                 label: 'Ratings',

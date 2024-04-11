@@ -5,6 +5,7 @@ import {View} from './View';
 import {Service} from './Service';
 import axios from 'axios';
 import {useEffect} from 'react';
+import {GlobalContext} from './Context';
 
 let books = [
     {title: 'The Sword of Kaigen', id: 1, rating: 4.8},
@@ -18,48 +19,32 @@ let books = [
 ];
 
 function App() {
-    // useEffect(() => {
-    //         async function fetchData() {
-    //             await axios.get(`http://localhost:5000/games/?pageOffset=${gamePage * gamesPerPage}&pageSize=${gamesPerPage}`).then((response) => {
-    //                 return response.data;
-    //             }).then((data) => {
-    //                 setGames(data);
-    //             });
-    //         }
-    //         fetchData();
-    //     }, [gamePage, gamesPerPage] // Things to listen for.
-    // );
     const [list, setList] = useState([]);
+    const [selectedBook, setSelectedBook] = useState({title: 'Title', id: 0, rating: 0});
+    const [bookTitles, setBookTitles] = useState([]);
+    const [bookRatings, setBookRatings] = useState([]);
 
-
-    // useEffect(() => {
-    //         async function fetchData() {
-    //             await Axios.get(`http://localhost:5000/books/`).then((response) => {
-    //                 return response.data;
-    //             }).then((data) => {
-    //                 setList(data);
-    //                 console.log(data);
-    //             });
-    //         }
-    //         fetchData();
-    //     }, []
-    // );
-
-    const fetchData = () => {
-        axios.get(`http://localhost:5000/books/`).then((response) => {
-            setList(response.data);
+    async function fetchData(){
+        await axios.get(`http://localhost:5000/books/notSorted`).then((response) => {
             console.log(response.data);
+            setList(response.data);
+            setSelectedBook(response.data[0])
+            return response.data;
+        })
+        await axios.get(`http://localhost:5000/books/titles`).then((response) => {
+            console.log(response.data);
+            setBookTitles(response.data);
+            return response.data;
+        })
+        await axios.get(`http://localhost:5000/books/ratings`).then((response) => {
+            console.log(response.data);
+            setBookRatings(response.data);
             return response.data;
         })
     }
 
-    fetchData()
-    const das = () => {
-        console.log(1)
+    useEffect(() => {fetchData()}, [])
 
-    }
-    das()
-    const [selectedBook, setSelectedBook] = useState(list[0]);
 
     return (
         <BrowserRouter>
@@ -69,12 +54,9 @@ function App() {
                         exact
                         path='/'
                         element={
-                            <Service
-                                list={list}
-                                fetchData={fetchData} //CAREFUL HERE
-                                setSelectedBook={setSelectedBook}
-                            />
-                        }
+                            <GlobalContext.Provider value={{list, fetchData, bookTitles, bookRatings, setSelectedBook}}>
+                                <Service/>
+                            </GlobalContext.Provider>}
                     />
                     <Route
                         path='/view'
