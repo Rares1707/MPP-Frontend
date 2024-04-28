@@ -7,6 +7,7 @@ import Axios from 'axios';
 import axios from 'axios';
 import async from 'async';
 import {GlobalContext} from './Context';
+import {CheckConnection} from './CheckConnection';
 
 function TextBox({state, onChange, placeholder}) {
     return (
@@ -37,10 +38,12 @@ export function Service() {
         const newBook = {
             title: bookTitleText,
             rating: bookRatingText,
+            id: bookIdText
         };
         await axios.post(`http://localhost:5000/books/nothing`, {
             title: newBook.title,
             rating: newBook.rating,
+            id: newBook.id
         }).then((response) => {
             console.log(response)
             fetchData()

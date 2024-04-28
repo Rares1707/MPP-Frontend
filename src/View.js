@@ -1,4 +1,5 @@
 import {Link} from 'react-router-dom';
+import {CheckConnection} from './CheckConnection';
 
 export function View({book = {title: 'Title', rating: 0, id: 0}}) {
     return (
