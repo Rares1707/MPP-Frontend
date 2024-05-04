@@ -100,7 +100,6 @@ export function Service() {
             setCurrentPage(currentPage+1)
     }
 
-
     return (
         <header className='App-header'>
             <section>
