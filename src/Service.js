@@ -1,11 +1,9 @@
-import {useContext, useEffect, useState} from 'react';
+import {useContext,  useState} from 'react';
 import {RatingsLineChart} from './RatingsLineChart';
 import {BookList} from './BookList';
 import {DropdownList} from './DropdownList';
 import {Button} from './Button';
-import Axios from 'axios';
 import axios from 'axios';
-import async from 'async';
 import {GlobalContext} from './Context';
 import {CheckConnection} from './CheckConnection';
 
@@ -82,10 +80,7 @@ export function Service() {
 
     function handleClickSort()
     {
-        axios.get(`http://localhost:5000/books/sorted`).then((response) => {
-            console.log(response.data);
-            fetchData()
-        })
+        fetchData(true)
     }
 
     function handleClickPreviousPage()

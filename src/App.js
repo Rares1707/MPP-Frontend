@@ -24,8 +24,12 @@ function App() {
     const [bookTitles, setBookTitles] = useState([]);
     const [bookRatings, setBookRatings] = useState([]);
 
-    async function fetchData(){
-        await axios.get(`http://localhost:5000/books/notSorted`).then((response) => {
+    async function fetchData(sortBooksByRating=false){
+        let getBooksURL = `http://localhost:5000/books/notSorted`
+        if (sortBooksByRating){
+            getBooksURL = `http://localhost:5000/books/sorted`
+        }
+        await axios.get(getBooksURL).then((response) => {
             console.log(response.data);
             setList(response.data);
             setSelectedBook(response.data[0])
