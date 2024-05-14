@@ -6,6 +6,7 @@ import {Service} from './Service';
 import axios from 'axios';
 import {useEffect} from 'react';
 import {GlobalContext} from './Context';
+import {LoginPage} from './LoginPage';
 
 let books = [
     {title: 'The Sword of Kaigen', id: 1, rating: 4.8},
@@ -23,31 +24,32 @@ function App() {
     const [selectedBook, setSelectedBook] = useState({title: 'Title', id: 0, rating: 0});
     const [bookTitles, setBookTitles] = useState([]);
     const [bookRatings, setBookRatings] = useState([]);
+    const [httpRequestConfiguration, setHttpRequestConfiguration] = useState({});
 
-    async function fetchData(sortBooksByRating=false){
+    async function fetchData(sortBooksByRating=false, httpRequestConfiguration){
         let getBooksURL = `http://localhost:5000/books/notSorted`
         if (sortBooksByRating){
             getBooksURL = `http://localhost:5000/books/sorted`
         }
-        await axios.get(getBooksURL).then((response) => {
+        await axios.get(getBooksURL, httpRequestConfiguration).then((response) => {
             console.log(response.data);
             setList(response.data);
             setSelectedBook(response.data[0])
             return response.data;
         })
-        await axios.get(`http://localhost:5000/books/titles`).then((response) => {
+        await axios.get(`http://localhost:5000/books/titles`, httpRequestConfiguration).then((response) => {
             console.log(response.data);
             setBookTitles(response.data);
             return response.data;
         })
-        await axios.get(`http://localhost:5000/books/ratings`).then((response) => {
+        await axios.get(`http://localhost:5000/books/ratings`, httpRequestConfiguration).then((response) => {
             console.log(response.data);
             setBookRatings(response.data);
             return response.data;
         })
     }
 
-    useEffect(() => {fetchData()}, [])
+    //useEffect(() => {fetchData()}, [])
 
 
     return (
@@ -55,12 +57,23 @@ function App() {
             <div className='App'>
                 <Routes>
                     <Route
-                        exact
-                        path='/'
+                        //exact
+                        path='/home'
                         element={
-                            <GlobalContext.Provider value={{list, fetchData, bookTitles, bookRatings, setSelectedBook}}>
+                            <GlobalContext.Provider value={{
+                                list,
+                                fetchData,
+                                bookTitles,
+                                bookRatings,
+                                setSelectedBook,
+                                httpRequestConfiguration,
+                                setHttpRequestConfiguration}}>
                                 <Service/>
                             </GlobalContext.Provider>}
+                    />
+                    <Route
+                        path='/'
+                        element={<LoginPage/>}
                     />
                     <Route
                         path='/view'

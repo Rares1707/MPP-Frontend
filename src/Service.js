@@ -1,4 +1,4 @@
-import {useContext,  useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {RatingsLineChart} from './RatingsLineChart';
 import {BookList} from './BookList';
 import {DropdownList} from './DropdownList';
@@ -25,7 +25,19 @@ export function Service() {
     const [pageSize, setPageSize] = useState(3);
     const [currentPage, setCurrentPage] = useState(0)
 
-    const {list, fetchData, setSelectedBook, bookTitles, bookRatings} = useContext(GlobalContext);
+    const {list, fetchData, setSelectedBook, bookTitles, bookRatings, httpRequestConfiguration, setHttpRequestConfiguration} =
+        useContext(GlobalContext);
+
+    const accessToken = localStorage.getItem("access_token");
+    // const httpRequestConfiguration = {
+    //     headers: { Authorization: `Bearer ${accessToken}` }
+    // };
+    //setHttpRequestConfiguration()
+    useEffect(() => {
+        setHttpRequestConfiguration({headers: { Authorization: `Bearer ${accessToken}` }})
+    }, [])
+
+    useEffect(() => {fetchData()}, [])
 
     async function handleClickAdd()  {
         if (bookTitleText === '') return;
@@ -42,7 +54,7 @@ export function Service() {
             title: newBook.title,
             rating: newBook.rating,
             id: newBook.id
-        }).then((response) => {
+        }, httpRequestConfiguration).then((response) => {
             console.log(response)
             fetchData()
         });
@@ -56,7 +68,7 @@ export function Service() {
         await axios.delete(`http://localhost:5000/book/${bookIdText}`).then((response) => {
             console.log(response)
             fetchData();
-        })
+        }, httpRequestConfiguration)
         if (list.length <= pageSize*currentPage)
             handleClickPreviousPage()
     }
@@ -72,7 +84,7 @@ export function Service() {
         await axios.put(`http://localhost:5000/book/${bookIdText}`, {
             title: bookTitleText,
             rating: bookRatingText
-        }).then((response) => {
+        }, httpRequestConfiguration).then((response) => {
             console.log(response)
             fetchData();
         })
