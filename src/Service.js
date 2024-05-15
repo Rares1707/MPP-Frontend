@@ -24,20 +24,17 @@ export function Service() {
     const [bookIdText, setBookIdText] = useState('');
     const [pageSize, setPageSize] = useState(3);
     const [currentPage, setCurrentPage] = useState(0)
+    const [userCreationDate, setUserCreationDate] = useState('')
+    const httpRequestConfiguration = {headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` }}
 
-    const {list, fetchData, setSelectedBook, bookTitles, bookRatings, httpRequestConfiguration, setHttpRequestConfiguration} =
-        useContext(GlobalContext);
+    const {list, fetchData, setSelectedBook, bookTitles, bookRatings} = useContext(GlobalContext);
 
-    const accessToken = localStorage.getItem("access_token");
-    // const httpRequestConfiguration = {
-    //     headers: { Authorization: `Bearer ${accessToken}` }
-    // };
-    //setHttpRequestConfiguration()
     useEffect(() => {
-        setHttpRequestConfiguration({headers: { Authorization: `Bearer ${accessToken}` }})
+        fetchData()
+        axios.get('http://localhost:5000/userCreationDate', httpRequestConfiguration).then((response) => {
+            setUserCreationDate(response.data)
+        })
     }, [])
-
-    useEffect(() => {fetchData()}, [])
 
     async function handleClickAdd()  {
         if (bookTitleText === '') return;
@@ -65,10 +62,10 @@ export function Service() {
         if (bookIdText === '') return;
         if (bookIdText.valueOf() < 0) return;
 
-        await axios.delete(`http://localhost:5000/book/${bookIdText}`).then((response) => {
+        await axios.delete(`http://localhost:5000/book/${bookIdText}`, httpRequestConfiguration).then((response) => {
             console.log(response)
             fetchData();
-        }, httpRequestConfiguration)
+        })
         if (list.length <= pageSize*currentPage)
             handleClickPreviousPage()
     }
@@ -110,6 +107,7 @@ export function Service() {
     return (
         <header className='App-header'>
             <section>
+                <h1>You've been a user since {userCreationDate}</h1>
                 <BookList list={list} setSelectedBook={setSelectedBook} pageSize={pageSize} currentPage={currentPage}/>
                 <Button onClick={handleClickPreviousPage} prompt={'<<'}/>
                 <Button onClick={handleClickNextPage} prompt={'>>'}/>

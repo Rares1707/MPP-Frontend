@@ -17,7 +17,8 @@ export function LoginPage() {
                 username,
                 password,
             });
-            localStorage.setItem("access_token", response.data.access_token);
+            sessionStorage.setItem("access_token", response.data.access_token);
+            //console.log(localStorage.getItem("access_token"));
             alert("Login successful");
             setLoggedInSuccessfully(true);
         }

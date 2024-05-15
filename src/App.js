@@ -24,9 +24,10 @@ function App() {
     const [selectedBook, setSelectedBook] = useState({title: 'Title', id: 0, rating: 0});
     const [bookTitles, setBookTitles] = useState([]);
     const [bookRatings, setBookRatings] = useState([]);
-    const [httpRequestConfiguration, setHttpRequestConfiguration] = useState({});
 
-    async function fetchData(sortBooksByRating=false, httpRequestConfiguration){
+    async function fetchData(sortBooksByRating=false){
+        const httpRequestConfiguration = {headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` }}
+        console.log(httpRequestConfiguration)
         let getBooksURL = `http://localhost:5000/books/notSorted`
         if (sortBooksByRating){
             getBooksURL = `http://localhost:5000/books/sorted`
@@ -66,8 +67,7 @@ function App() {
                                 bookTitles,
                                 bookRatings,
                                 setSelectedBook,
-                                httpRequestConfiguration,
-                                setHttpRequestConfiguration}}>
+                                }}>
                                 <Service/>
                             </GlobalContext.Provider>}
                     />

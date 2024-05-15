@@ -9,7 +9,7 @@ export function View({book = {title: 'Title', rating: 0, id: 0}}) {
                 <section>Title: {book.title}</section>
                 <section>Rating: {book.rating}</section>
                 <button>
-                    <Link to='/'>Back</Link>
+                    <Link to='/home'>Back</Link>
                 </button>
             </header>
         </div>
