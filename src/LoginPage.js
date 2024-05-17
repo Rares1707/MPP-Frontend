@@ -13,7 +13,7 @@ export function LoginPage() {
         event.preventDefault();
         try
         {
-            const response = await axios.post("http://localhost:5000/login", {
+            const response = await axios.post(sessionStorage.getItem('hostAddress') + "/login", {
                 username,
                 password,
             });
@@ -34,7 +34,8 @@ export function LoginPage() {
         event.preventDefault();
         try
         {
-            const response = await axios.post("http://localhost:5000/register", {
+            const response = await axios.post(
+                sessionStorage.getItem('hostAddress') +"/register", {
                 username,
                 password,
             });

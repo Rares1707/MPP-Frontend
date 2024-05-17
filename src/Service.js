@@ -31,7 +31,7 @@ export function Service() {
 
     useEffect(() => {
         fetchData()
-        axios.get('http://localhost:5000/userCreationDate', httpRequestConfiguration).then((response) => {
+        axios.get(sessionStorage.getItem('hostAddress') + '/userCreationDate', httpRequestConfiguration).then((response) => {
             setUserCreationDate(response.data)
         })
     }, [])
@@ -47,7 +47,7 @@ export function Service() {
             rating: bookRatingText,
             id: bookIdText
         };
-        await axios.post(`http://localhost:5000/books/nothing`, {
+        await axios.post(sessionStorage.getItem('hostAddress') + `/books/nothing`, {
             title: newBook.title,
             rating: newBook.rating,
             id: newBook.id
@@ -62,7 +62,7 @@ export function Service() {
         if (bookIdText === '') return;
         if (bookIdText.valueOf() < 0) return;
 
-        await axios.delete(`http://localhost:5000/book/${bookIdText}`, httpRequestConfiguration).then((response) => {
+        await axios.delete(sessionStorage.getItem('hostAddress') + `/book/${bookIdText}`, httpRequestConfiguration).then((response) => {
             console.log(response)
             fetchData();
         })
@@ -78,7 +78,7 @@ export function Service() {
         if (bookRatingText === '') return;
         if (bookRatingText.valueOf() < 0) return;
 
-        await axios.put(`http://localhost:5000/book/${bookIdText}`, {
+        await axios.put(sessionStorage.getItem('hostAddress') + `/book/${bookIdText}`, {
             title: bookTitleText,
             rating: bookRatingText
         }, httpRequestConfiguration).then((response) => {
@@ -107,6 +107,7 @@ export function Service() {
     return (
         <header className='App-header'>
             <section>
+                <CheckConnection/>
                 <h1>You've been a user since {userCreationDate}</h1>
                 <BookList list={list} setSelectedBook={setSelectedBook} pageSize={pageSize} currentPage={currentPage}/>
                 <Button onClick={handleClickPreviousPage} prompt={'<<'}/>

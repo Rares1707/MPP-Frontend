@@ -20,6 +20,10 @@ let books = [
 ];
 
 function App() {
+    const localhostAddress = 'http://localhost:5000'
+    const cloudhostAddress = 'https://assignment6-no-auth-r6yrpdob5q-uc.a.run.app'
+    sessionStorage.setItem('hostAddress', localhostAddress)
+
     const [list, setList] = useState([]);
     const [selectedBook, setSelectedBook] = useState({title: 'Title', id: 0, rating: 0});
     const [bookTitles, setBookTitles] = useState([]);
@@ -28,9 +32,9 @@ function App() {
     async function fetchData(sortBooksByRating=false){
         const httpRequestConfiguration = {headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` }}
         console.log(httpRequestConfiguration)
-        let getBooksURL = `http://localhost:5000/books/notSorted`
+        let getBooksURL = sessionStorage.getItem('hostAddress') + `/books/notSorted`
         if (sortBooksByRating){
-            getBooksURL = `http://localhost:5000/books/sorted`
+            getBooksURL = sessionStorage.getItem('hostAddress') + `/books/sorted`
         }
         await axios.get(getBooksURL, httpRequestConfiguration).then((response) => {
             console.log(response.data);
@@ -38,12 +42,12 @@ function App() {
             setSelectedBook(response.data[0])
             return response.data;
         })
-        await axios.get(`http://localhost:5000/books/titles`, httpRequestConfiguration).then((response) => {
+        await axios.get(sessionStorage.getItem('hostAddress') + `/books/titles`, httpRequestConfiguration).then((response) => {
             console.log(response.data);
             setBookTitles(response.data);
             return response.data;
         })
-        await axios.get(`http://localhost:5000/books/ratings`, httpRequestConfiguration).then((response) => {
+        await axios.get(sessionStorage.getItem('hostAddress') + `/books/ratings`, httpRequestConfiguration).then((response) => {
             console.log(response.data);
             setBookRatings(response.data);
             return response.data;
