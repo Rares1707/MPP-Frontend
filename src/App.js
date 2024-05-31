@@ -22,7 +22,7 @@ let books = [
 function App() {
     const localhostAddress = 'http://localhost:5000'
     const cloudhostAddress = 'https://assignment6-no-auth-r6yrpdob5q-uc.a.run.app'
-    sessionStorage.setItem('hostAddress', localhostAddress)
+    sessionStorage.setItem('hostAddress', cloudhostAddress)
 
     const [list, setList] = useState([]);
     const [selectedBook, setSelectedBook] = useState({title: 'Title', id: 0, rating: 0});

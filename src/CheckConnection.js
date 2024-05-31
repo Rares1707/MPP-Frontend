@@ -1,5 +1,6 @@
 import Axios from 'axios';
 import { useState } from 'react';
+import {Navigate} from 'react-router-dom';
 
 export function CheckConnection() {
     const checkInterval = 5000;
@@ -20,7 +21,11 @@ export function CheckConnection() {
     }
 
     setInterval(checkConnection, checkInterval);
-
+    if (sessionStorage.getItem("access_token") === null) {
+        return (
+            <Navigate to="/" />
+        );
+    }
     return (
         <>
             {isOffline && <h2>You are offline. Retrying in 5 seconds</h2>}

@@ -1,4 +1,4 @@
-import {Link} from 'react-router-dom';
+import {Link, Navigate} from 'react-router-dom';
 import axios from 'axios';
 
 export function BookList({list, setSelectedBook, pageSize, currentPage}) {
@@ -8,6 +8,13 @@ export function BookList({list, setSelectedBook, pageSize, currentPage}) {
     {
         displayedBooks.push(list[lowerBound + i])
     }
+
+    if (sessionStorage.getItem("access_token") === null) {
+        return (
+            <Navigate to="/" />
+        );
+    }
+
     let listOfBooks = displayedBooks.map((book) => (
         <li key={book.id}>
             <strong>

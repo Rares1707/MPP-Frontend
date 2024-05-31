@@ -8,6 +8,7 @@ import {
     Legend
 } from 'chart.js';
 import axios from 'axios';
+import {Navigate} from 'react-router-dom';
 
 ChartJS.register(
     LineElement,
@@ -33,7 +34,11 @@ export function RatingsLineChart({bookTitles, bookRatings}){
             },
         ],
     };
-
+    if (sessionStorage.getItem("access_token") === null) {
+        return (
+            <Navigate to="/" />
+        );
+    }
     return(
         <Line
         data={data}

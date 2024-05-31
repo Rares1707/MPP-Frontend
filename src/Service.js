@@ -6,6 +6,7 @@ import {Button} from './Button';
 import axios from 'axios';
 import {GlobalContext} from './Context';
 import {CheckConnection} from './CheckConnection';
+import {Navigate} from 'react-router-dom';
 
 function TextBox({state, onChange, placeholder}) {
     return (
@@ -104,6 +105,11 @@ export function Service() {
             setCurrentPage(currentPage+1)
     }
 
+    if (sessionStorage.getItem("access_token") === null) {
+        return (
+            <Navigate to="/" />
+        );
+    }
     return (
         <header className='App-header'>
             <section>
