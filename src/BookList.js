@@ -2,12 +2,12 @@ import {Link, Navigate} from 'react-router-dom';
 import axios from 'axios';
 
 export function BookList({list, setSelectedBook, pageSize, currentPage}) {
-    let displayedBooks = []
+    /*let displayedBooks = []
     const lowerBound = currentPage*pageSize
     for (let i= 0; (i < pageSize) && (lowerBound + i < list.length); i++)
     {
         displayedBooks.push(list[lowerBound + i])
-    }
+    }*/
 
     if (sessionStorage.getItem("access_token") === null) {
         return (
@@ -15,13 +15,13 @@ export function BookList({list, setSelectedBook, pageSize, currentPage}) {
         );
     }
 
-    let listOfBooks = displayedBooks.map((book) => (
+    let listOfBooks = list.map((book) => (
         <li key={book.id}>
             <strong>
                 <Link
                     to='/view'
                     onClick={() => {
-                        let bookFound = displayedBooks.find(
+                        let bookFound = list.find(
                             (el) => book.title === el.title,
                         );
                         if (bookFound === undefined)

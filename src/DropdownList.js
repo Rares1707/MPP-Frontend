@@ -1,12 +1,13 @@
 import {useState} from 'react';
 import {Button} from './Button';
 
-export function DropdownList({setPageSize, setCurrentPage}) {
+export function DropdownList({setPageSize, setCurrentPage, fetchCurrentPage}) {
     const [isOpen, setIsOpen] = useState(false);
     function handleClickSelectPageSize(selectedPageSize){
         setPageSize(selectedPageSize);
-        setCurrentPage(0);
+        setCurrentPage(1);
         setIsOpen(!isOpen);
+        fetchCurrentPage();
     }
 
     return (

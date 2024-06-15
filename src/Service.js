@@ -7,6 +7,7 @@ import axios from 'axios';
 import {GlobalContext} from './Context';
 import {CheckConnection} from './CheckConnection';
 import {Navigate} from 'react-router-dom';
+import { io } from 'socket.io-client'
 
 function TextBox({state, onChange, placeholder}) {
     return (
@@ -23,19 +24,73 @@ export function Service() {
     const [bookTitleText, setBookTitleText] = useState('');
     const [bookRatingText, setBookRatingText] = useState('');
     const [bookIdText, setBookIdText] = useState('');
-    const [pageSize, setPageSize] = useState(3);
-    const [currentPage, setCurrentPage] = useState(0)
+    //const [pageSize, setPageSize] = useState(3);
+    //const [currentPage, setCurrentPage] = useState(1)
     const [userCreationDate, setUserCreationDate] = useState('')
     const httpRequestConfiguration = {headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` }}
 
-    const {list, fetchData, setSelectedBook, bookTitles, bookRatings} = useContext(GlobalContext);
+    const {list, setList, fetchData, setSelectedBook, bookTitles, bookRatings, pageSize, setPageSize, currentPage, setCurrentPage} = useContext(GlobalContext);
+
+    function configureSocket()
+    {
+        const URL = sessionStorage.getItem('hostAddress')
+        const socket = io(URL, {
+            autoConnect: false
+        })
+        socket.on('refresh', data => {
+            fetchData()
+        })
+        socket.connect()
+    }
 
     useEffect(() => {
+        configureSocket()
         fetchData()
         axios.get(sessionStorage.getItem('hostAddress') + '/userCreationDate', httpRequestConfiguration).then((response) => {
             setUserCreationDate(response.data)
         })
     }, [])
+
+    async function fetchCurrentPage(sortBooksByRating=false){
+        const httpRequestConfiguration = {headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` }}
+        let getBooksURL = sessionStorage.getItem('hostAddress') + `/books?type=notSorted&page=` + currentPage + '&pageSize=' + pageSize
+        if (sortBooksByRating){
+            getBooksURL = sessionStorage.getItem('hostAddress') + `/books?type=sorted&page=` + currentPage + '&pageSize=' + pageSize
+        }
+        console.log(currentPage)
+        await axios.get(getBooksURL, httpRequestConfiguration).then((response) => {
+            setList(response.data);
+            setSelectedBook(response.data[0])
+        })
+    }
+
+    async function fetchNextPage(sortBooksByRating=false){
+        const httpRequestConfiguration = {headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` }}
+        const page = currentPage + 1
+        let getBooksURL = sessionStorage.getItem('hostAddress') + `/books?type=notSorted&page=` + page + '&pageSize=' + pageSize
+        if (sortBooksByRating){
+            getBooksURL = sessionStorage.getItem('hostAddress') + `/books?type=sorted&page=` + currentPage + '&pageSize=' + pageSize
+        }
+        console.log(currentPage)
+        await axios.get(getBooksURL, httpRequestConfiguration).then((response) => {
+            setList(response.data);
+            setSelectedBook(response.data[0])
+        })
+    }
+
+    async function fetchPreviousPage(sortBooksByRating=false){
+        const httpRequestConfiguration = {headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` }}
+        const page = currentPage - 1
+        let getBooksURL = sessionStorage.getItem('hostAddress') + `/books?type=notSorted&page=` + page + '&pageSize=' + pageSize
+        if (sortBooksByRating){
+            getBooksURL = sessionStorage.getItem('hostAddress') + `/books?type=sorted&page=` + currentPage + '&pageSize=' + pageSize
+        }
+        console.log(currentPage)
+        await axios.get(getBooksURL, httpRequestConfiguration).then((response) => {
+            setList(response.data);
+            setSelectedBook(response.data[0])
+        })
+    }
 
     async function handleClickAdd()  {
         if (bookTitleText === '') return;
@@ -90,19 +145,24 @@ export function Service() {
 
     function handleClickSort()
     {
-        fetchData(true)
+        fetchCurrentPage(true) // not needed, you only need the sorted contents of the current page
     }
 
     function handleClickPreviousPage()
     {
-        if (currentPage > 0)
-            setCurrentPage(currentPage-1)
+        if (currentPage > 1) {
+            fetchPreviousPage()
+            setCurrentPage(currentPage - 1)
+        }
     }
 
     function handleClickNextPage()
     {
-        if (pageSize*(currentPage+1) < list.length)
-            setCurrentPage(currentPage+1)
+        console.log('first' + currentPage)
+        //if (pageSize*(currentPage+1) < list.length)
+        //    setCurrentPage(currentPage+1)
+        fetchNextPage()
+        setCurrentPage(currentPage + 1)
     }
 
     if (sessionStorage.getItem("access_token") === null) {
@@ -147,7 +207,7 @@ export function Service() {
                 <Button onClick={handleClickUpdate} prompt={'Update'} />
                 <Button onClick={handleClickSort} prompt={'Sort'} />
             </section>
-            <DropdownList setPageSize={setPageSize} setCurrentPage={setCurrentPage}/>
+            <DropdownList setPageSize={setPageSize} setCurrentPage={setCurrentPage} fetchCurrentPage={fetchCurrentPage}/>
         </header>
     );
 }

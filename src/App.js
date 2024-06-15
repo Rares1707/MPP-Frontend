@@ -22,19 +22,20 @@ let books = [
 function App() {
     const localhostAddress = 'http://localhost:5000'
     const cloudhostAddress = 'https://assignment6-no-auth-r6yrpdob5q-uc.a.run.app'
-    sessionStorage.setItem('hostAddress', cloudhostAddress)
+    sessionStorage.setItem('hostAddress', localhostAddress)
 
     const [list, setList] = useState([]);
     const [selectedBook, setSelectedBook] = useState({title: 'Title', id: 0, rating: 0});
     const [bookTitles, setBookTitles] = useState([]);
     const [bookRatings, setBookRatings] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(3);
 
     async function fetchData(sortBooksByRating=false){
         const httpRequestConfiguration = {headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` }}
-        console.log(httpRequestConfiguration)
-        let getBooksURL = sessionStorage.getItem('hostAddress') + `/books/notSorted`
+        let getBooksURL = sessionStorage.getItem('hostAddress') + `/books?type=notSorted&page=` + currentPage + '&pageSize=' + pageSize
         if (sortBooksByRating){
-            getBooksURL = sessionStorage.getItem('hostAddress') + `/books/sorted`
+            getBooksURL = sessionStorage.getItem('hostAddress') + `/books?type=sorted&page=` + currentPage + '&pageSize=' + pageSize
         }
         await axios.get(getBooksURL, httpRequestConfiguration).then((response) => {
             console.log(response.data);
@@ -42,12 +43,12 @@ function App() {
             setSelectedBook(response.data[0])
             return response.data;
         })
-        await axios.get(sessionStorage.getItem('hostAddress') + `/books/titles`, httpRequestConfiguration).then((response) => {
+        await axios.get(sessionStorage.getItem('hostAddress') + `/books?type=titles`, httpRequestConfiguration).then((response) => {
             console.log(response.data);
             setBookTitles(response.data);
             return response.data;
         })
-        await axios.get(sessionStorage.getItem('hostAddress') + `/books/ratings`, httpRequestConfiguration).then((response) => {
+        await axios.get(sessionStorage.getItem('hostAddress') + `/books?type=ratings`, httpRequestConfiguration).then((response) => {
             console.log(response.data);
             setBookRatings(response.data);
             return response.data;
@@ -67,10 +68,15 @@ function App() {
                         element={
                             <GlobalContext.Provider value={{
                                 list,
+                                setList,
                                 fetchData,
                                 bookTitles,
                                 bookRatings,
                                 setSelectedBook,
+                                currentPage,
+                                setCurrentPage,
+                                pageSize,
+                                setPageSize
                                 }}>
                                 <Service/>
                             </GlobalContext.Provider>}
