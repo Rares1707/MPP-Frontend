@@ -1,5 +1,4 @@
 import {Link, Navigate} from 'react-router-dom';
-import {CheckConnection} from './CheckConnection';
 
 export function View({book = {title: 'Title', rating: 0, id: 0}}) {
     if (sessionStorage.getItem("access_token") === null) {

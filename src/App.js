@@ -2,11 +2,12 @@ import './App.css';
 import {useState} from 'react';
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import {View} from './View';
-import {Service} from './Service';
+import {MainPage} from './MainPage';
 import axios from 'axios';
 import {useEffect} from 'react';
 import {GlobalContext} from './Context';
 import {LoginPage} from './LoginPage';
+import ConnectionChecker from './ConnectionChecker';
 
 let books = [
     {title: 'The Sword of Kaigen', id: 1, rating: 4.8},
@@ -30,6 +31,7 @@ function App() {
     const [bookRatings, setBookRatings] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(3);
+    const [connectionOffline, setConnectionOffline] = useState(false);
 
     async function fetchData(sortBooksByRating=false){
         const httpRequestConfiguration = {headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` }}
@@ -60,6 +62,9 @@ function App() {
 
     return (
         <BrowserRouter>
+            <GlobalContext.Provider value={{connectionOffline, setConnectionOffline}}>
+                <ConnectionChecker/>
+            </GlobalContext.Provider>
             <div className='App'>
                 <Routes>
                     <Route
@@ -76,9 +81,10 @@ function App() {
                                 currentPage,
                                 setCurrentPage,
                                 pageSize,
-                                setPageSize
+                                setPageSize,
+                                connectionOffline,
                                 }}>
-                                <Service/>
+                                <MainPage/>
                             </GlobalContext.Provider>}
                     />
                     <Route

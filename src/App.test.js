@@ -1,6 +1,6 @@
 import {render, screen} from '@testing-library/react';
 import {View} from './View';
-import {Service} from './Service';
+import {MainPage} from './MainPage';
 import {BrowserRouter} from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -34,7 +34,7 @@ test('test service rendering', () => {
 
     render(
         <BrowserRouter>
-            <Service list={list}/>
+            <MainPage list={list}/>
         </BrowserRouter>
     );
     const serviceList = screen.getByRole('list')
@@ -73,7 +73,7 @@ function TestService()
     const [selectedBook, setSelectedBook] = useState(books[0]);
 
     return(<BrowserRouter>
-        <Service list={list} setList={setList} setSelectedBook={setSelectedBook}/>
+        <MainPage list={list} setList={setList} setSelectedBook={setSelectedBook}/>
     </BrowserRouter>)
 }
 

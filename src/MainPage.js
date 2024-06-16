@@ -5,9 +5,9 @@ import {DropdownList} from './DropdownList';
 import {Button} from './Button';
 import axios from 'axios';
 import {GlobalContext} from './Context';
-import {CheckConnection} from './CheckConnection';
 import {Navigate} from 'react-router-dom';
 import { io } from 'socket.io-client'
+import {BookRepository} from './BookRepository'
 
 function TextBox({state, onChange, placeholder}) {
     return (
@@ -20,7 +20,8 @@ function TextBox({state, onChange, placeholder}) {
     );
 }
 
-export function Service() {
+export function MainPage() {
+    const repository = new BookRepository()
     const [bookTitleText, setBookTitleText] = useState('');
     const [bookRatingText, setBookRatingText] = useState('');
     const [bookIdText, setBookIdText] = useState('');
@@ -28,7 +29,7 @@ export function Service() {
     //const [currentPage, setCurrentPage] = useState(1)
     const [userCreationDate, setUserCreationDate] = useState('')
     const httpRequestConfiguration = {headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` }}
-
+    const MINIMUM_PAGE = 1
     const {list, setList, fetchData, setSelectedBook, bookTitles, bookRatings, pageSize, setPageSize, currentPage, setCurrentPage} = useContext(GlobalContext);
 
     function configureSocket()
@@ -52,43 +53,23 @@ export function Service() {
     }, [])
 
     async function fetchCurrentPage(sortBooksByRating=false){
-        const httpRequestConfiguration = {headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` }}
-        let getBooksURL = sessionStorage.getItem('hostAddress') + `/books?type=notSorted&page=` + currentPage + '&pageSize=' + pageSize
-        if (sortBooksByRating){
-            getBooksURL = sessionStorage.getItem('hostAddress') + `/books?type=sorted&page=` + currentPage + '&pageSize=' + pageSize
-        }
-        console.log(currentPage)
-        await axios.get(getBooksURL, httpRequestConfiguration).then((response) => {
-            setList(response.data);
-            setSelectedBook(response.data[0])
+        repository.getBooks(currentPage, pageSize, sortBooksByRating).then((response) => {
+            setList(response)
+            setSelectedBook(response[0])
         })
     }
 
     async function fetchNextPage(sortBooksByRating=false){
-        const httpRequestConfiguration = {headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` }}
-        const page = currentPage + 1
-        let getBooksURL = sessionStorage.getItem('hostAddress') + `/books?type=notSorted&page=` + page + '&pageSize=' + pageSize
-        if (sortBooksByRating){
-            getBooksURL = sessionStorage.getItem('hostAddress') + `/books?type=sorted&page=` + currentPage + '&pageSize=' + pageSize
-        }
-        console.log(currentPage)
-        await axios.get(getBooksURL, httpRequestConfiguration).then((response) => {
-            setList(response.data);
-            setSelectedBook(response.data[0])
+        repository.getBooks(currentPage + 1, pageSize, sortBooksByRating).then((response) => {
+            setList(response)
+            setSelectedBook(response[0])
         })
     }
 
     async function fetchPreviousPage(sortBooksByRating=false){
-        const httpRequestConfiguration = {headers: { Authorization: `Bearer ${sessionStorage.getItem('access_token')}` }}
-        const page = currentPage - 1
-        let getBooksURL = sessionStorage.getItem('hostAddress') + `/books?type=notSorted&page=` + page + '&pageSize=' + pageSize
-        if (sortBooksByRating){
-            getBooksURL = sessionStorage.getItem('hostAddress') + `/books?type=sorted&page=` + currentPage + '&pageSize=' + pageSize
-        }
-        console.log(currentPage)
-        await axios.get(getBooksURL, httpRequestConfiguration).then((response) => {
-            setList(response.data);
-            setSelectedBook(response.data[0])
+        repository.getBooks(currentPage - 1, pageSize, sortBooksByRating).then((response) => {
+            setList(response)
+            setSelectedBook(response[0])
         })
     }
 
@@ -98,19 +79,16 @@ export function Service() {
         if (bookRatingText.valueOf() < 0) return;
         if (isNaN(parseFloat(bookRatingText))) return;
 
+
         const newBook = {
             title: bookTitleText,
             rating: bookRatingText,
             id: bookIdText
         };
-        await axios.post(sessionStorage.getItem('hostAddress') + `/books/nothing`, {
-            title: newBook.title,
-            rating: newBook.rating,
-            id: newBook.id
-        }, httpRequestConfiguration).then((response) => {
+        repository.addBook(newBook).then((response) => {
             console.log(response)
             fetchData()
-        });
+        })
     }
 
     async function handleClickRemove() {
@@ -118,9 +96,9 @@ export function Service() {
         if (bookIdText === '') return;
         if (bookIdText.valueOf() < 0) return;
 
-        await axios.delete(sessionStorage.getItem('hostAddress') + `/book/${bookIdText}`, httpRequestConfiguration).then((response) => {
+        repository.removeBook(bookIdText).then((response) => {
             console.log(response)
-            fetchData();
+            fetchData()
         })
         if (list.length <= pageSize*currentPage)
             handleClickPreviousPage()
@@ -134,18 +112,19 @@ export function Service() {
         if (bookRatingText === '') return;
         if (bookRatingText.valueOf() < 0) return;
 
-        await axios.put(sessionStorage.getItem('hostAddress') + `/book/${bookIdText}`, {
+        repository.updateBook(bookIdText, {
             title: bookTitleText,
             rating: bookRatingText
-        }, httpRequestConfiguration).then((response) => {
+        }).then((response) => {
             console.log(response)
-            fetchData();
+            fetchData()
         })
+
     }
 
-    function handleClickSort()
+    function handleClickSort()// this is weird now. Look in the backend. It probably only sorts the current page
     {
-        fetchCurrentPage(true) // not needed, you only need the sorted contents of the current page
+        fetchCurrentPage(true)
     }
 
     function handleClickPreviousPage()
@@ -165,6 +144,21 @@ export function Service() {
         setCurrentPage(currentPage + 1)
     }
 
+    function changePageSize(newPageSize)
+    {
+        setPageSize(newPageSize)
+        setCurrentPage(MINIMUM_PAGE)
+        fetchPageOfSize(MINIMUM_PAGE, newPageSize)
+    }
+
+    function fetchPageOfSize(page, pageSize)
+    {
+        repository.getBooks(page, pageSize).then((response) => {
+            setList(response)
+            setSelectedBook(response[0])
+        })
+    }
+
     if (sessionStorage.getItem("access_token") === null) {
         return (
             <Navigate to="/" />
@@ -173,7 +167,6 @@ export function Service() {
     return (
         <header className='App-header'>
             <section>
-                <CheckConnection/>
                 <h1>You've been a user since {userCreationDate}</h1>
                 <BookList list={list} setSelectedBook={setSelectedBook} pageSize={pageSize} currentPage={currentPage}/>
                 <Button onClick={handleClickPreviousPage} prompt={'<<'}/>
@@ -207,7 +200,7 @@ export function Service() {
                 <Button onClick={handleClickUpdate} prompt={'Update'} />
                 <Button onClick={handleClickSort} prompt={'Sort'} />
             </section>
-            <DropdownList setPageSize={setPageSize} setCurrentPage={setCurrentPage} fetchCurrentPage={fetchCurrentPage}/>
+            <DropdownList changePageSize={changePageSize}/>
         </header>
     );
 }
