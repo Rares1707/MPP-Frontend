@@ -39,7 +39,12 @@ export function MainPage() {
             autoConnect: false
         })
         socket.on('refresh', data => {
-            fetchData()
+            try{
+                fetchData()
+            }
+            catch (error){
+                console.log(error)
+            }
         })
         socket.connect()
     }

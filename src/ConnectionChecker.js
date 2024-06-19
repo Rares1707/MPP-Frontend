@@ -7,7 +7,7 @@ const ConnectionChecker = () => {
 
     const {connectionOffline, setConnectionOffline} = useContext(GlobalContext)
 
-    async function checkConnection() {
+    const checkConnection = async () => {
         try {
             await axios.get('http://localhost:5000/ping');
             if(connectionOffline === true)
@@ -19,14 +19,21 @@ const ConnectionChecker = () => {
     }
 
     useEffect(() => {
-        setInterval(checkConnection, checkInterval);
-    })
+        checkConnection();
+        const intervalId = setInterval(checkConnection, 5000);
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, []);
+
 
     return (
         <>
             {connectionOffline && <h2>You are offline. Retrying connection in 5 seconds.</h2>}
         </>
     );
+
+
 }
 
 export default ConnectionChecker;
